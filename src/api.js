@@ -8,6 +8,16 @@ const handleResponse = async (res) => {
   return data;
 };
 
+const authFetch = (token, url, options = {}) => {
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+  };
+
+  return fetch(url, { ...options, headers }).then(handleResponse);
+};
+
 export const registerUser = (payload) =>
   fetch(`${BASE_URL}/auth/register`, {
     method: 'POST',
@@ -27,11 +37,63 @@ export const loginUser = (payload) =>
   }).then(handleResponse);
 
 export const fetchVenues = (token) =>
-  fetch(`${BASE_URL}/venues`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }).then(handleResponse);
+  authFetch(token, `${BASE_URL}/venues`);
 
-export const fetchOrganizations = () =>
-  fetch(`${BASE_URL}/auth/organizations`).then(handleResponse);
+export const fetchOrganizations = (type) => {
+  const url = `${BASE_URL}/auth/organizations${type ? `?type=${encodeURIComponent(type)}` : ''}`;
+  return fetch(url).then(handleResponse);
+};
+
+export const submitBookingRequest = (token, payload) =>
+  authFetch(token, `${BASE_URL}/request/booking`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+export const submitNewVenueRequest = (token, payload) =>
+  authFetch(token, `${BASE_URL}/request/new-venue`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+export const fetchMyRequests = (token) =>
+  authFetch(token, `${BASE_URL}/request/my-requests`);
+
+export const fetchPendingUsers = (token) =>
+  authFetch(token, `${BASE_URL}/admin/pending`);
+
+export const approveUser = (token, id) =>
+  authFetch(token, `${BASE_URL}/admin/approve/${id}`, {
+    method: 'PUT',
+  });
+
+export const rejectUser = (token, id) =>
+  authFetch(token, `${BASE_URL}/admin/reject/${id}`, {
+    method: 'PUT',
+  });
+
+export const fetchPendingVenueRequests = (token) =>
+  authFetch(token, `${BASE_URL}/admin/venue-requests`);
+
+export const approveVenueRequest = (token, id) =>
+  authFetch(token, `${BASE_URL}/admin/venue-requests/${id}/approve`, {
+    method: 'PUT',
+  });
+
+export const rejectVenueRequest = (token, id) =>
+  authFetch(token, `${BASE_URL}/admin/venue-requests/${id}/reject`, {
+    method: 'PUT',
+  });
+
+export const fetchBookingRequests = (token) =>
+  authFetch(token, `${BASE_URL}/admin/booking-requests`);
+
+export const approveBookingRequest = (token, id) =>
+  authFetch(token, `${BASE_URL}/admin/booking-requests/${id}/approve`, {
+    method: 'PUT',
+  });
+
+export const rejectBookingRequest = (token, id) =>
+  authFetch(token, `${BASE_URL}/admin/booking-requests/${id}/reject`, {
+    method: 'PUT',
+  });

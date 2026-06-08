@@ -9,26 +9,43 @@ const AuthForm = ({ mode, onSubmit, isLoading, error }) => {
     organization_id: '',
     registration_number: ''
   });
+  const [orgType, setOrgType] = useState('');
   const [organizations, setOrganizations] = useState([]);
   const [orgError, setOrgError] = useState('');
 
   useEffect(() => {
     if (mode !== 'register') {
+      setOrgType('');
+      setOrganizations([]);
+      setForm((prev) => ({ ...prev, organization_id: '' }));
+      return;
+    }
+  }, [mode]);
+
+  const handleTypeChange = async (e) => {
+    const selectedType = e.target.value;
+    setOrgType(selectedType);
+    setForm((prev) => ({ ...prev, organization_id: '' }));
+    setOrganizations([]);
+    setOrgError('');
+
+    if (!selectedType) {
       return;
     }
 
-    const loadOrgs = async () => {
-      setOrgError('');
-      try {
-        const orgList = await fetchOrganizations();
-        setOrganizations(orgList);
-      } catch (err) {
-        setOrgError(err.message || 'Unable to load organizations.');
+    try {
+      const orgList = await fetchOrganizations(selectedType);
+      const filtered = Array.isArray(orgList)
+        ? orgList.filter((org) => String(org.type || '').toLowerCase() === selectedType.toLowerCase())
+        : [];
+      setOrganizations(filtered);
+      if (filtered.length === 0) {
+        setOrgError(`No ${selectedType} organizations found.`);
       }
-    };
-
-    loadOrgs();
-  }, [mode]);
+    } catch (err) {
+      setOrgError(err.message || 'Unable to load organizations.');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,25 +62,48 @@ const AuthForm = ({ mode, onSubmit, isLoading, error }) => {
       <h2 className="text-3xl font-semibold text-slate-100 mb-6 text-center">{mode === 'login' ? 'Sign In' : 'Register'}</h2>
       <form onSubmit={handleSubmit} className="space-y-5">
         {mode === 'register' && (
-          <div>
-            <label className="block text-sm font-medium text-slate-300">Organization</label>
-            <select
-              name="organization_id"
-              value={form.organization_id}
-              onChange={handleChange}
-              className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-cyan-500"
-            >
-              <option value="" disabled>
-                {organizations.length === 0 ? 'Loading organizations...' : 'Select an organization'}
-              </option>
-              {organizations.map((org) => (
-                <option key={org.id} value={org.id}>
-                  {org.name}
+          <>
+            <div>
+              <label className="block text-sm font-medium text-slate-300">Organization Type</label>
+              <select
+                name="organization_type"
+                value={orgType}
+                onChange={handleTypeChange}
+                className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-cyan-500"
+              >
+                <option value="" disabled>Select organization type</option>
+                <option value="club">Club</option>
+                <option value="department">Department</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300">Organization</label>
+              <select
+                name="organization_id"
+                value={form.organization_id}
+                onChange={handleChange}
+                disabled={!orgType}
+                className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-cyan-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="" disabled>
+                  {!orgType
+                    ? 'Select type first'
+                    : orgError
+                    ? orgError
+                    : organizations.length === 0
+                    ? 'Loading organizations...'
+                    : 'Select an organization'}
                 </option>
-              ))}
-            </select>
-            {orgError && <p className="mt-2 text-sm text-rose-400">{orgError}</p>}
-          </div>
+                {organizations.map((org) => (
+                  <option key={org.id} value={org.id}>
+                    {org.name}
+                  </option>
+                ))}
+              </select>
+              {orgError && !organizations.length && <p className="mt-2 text-sm text-rose-400">{orgError}</p>}
+            </div>
+          </>
         )}
 
         {mode === 'register' && (

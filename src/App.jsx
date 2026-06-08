@@ -72,7 +72,7 @@ function App() {
           <div>
             <p className="text-sm uppercase tracking-[0.3em] text-cyan-400/80">venue go</p>
             <h1 className="mt-3 text-4xl font-semibold text-slate-100 sm:text-5xl">Venue management client</h1>
-            <p className="mt-4 max-w-2xl text-slate-400">Register or sign in to browse venues and submit booking requests.</p>
+            <p className="mt-4 max-w-2xl text-slate-400">Register or sign in to browse venues, submit booking and venue requests, or manage approvals if you are an admin.</p>
           </div>
 
           {!user && (
@@ -86,7 +86,7 @@ function App() {
         </header>
 
         {user ? (
-          <Dashboard user={user} venues={venues} onLogout={handleLogout} onRefresh={loadVenues} />
+          <Dashboard user={user} token={token} venues={venues} onLogout={handleLogout} onRefresh={loadVenues} />
         ) : (
           <AuthForm mode={mode} onSubmit={handleAuthSubmit} isLoading={isLoading} error={error} />
         )}
