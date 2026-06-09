@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": " https://goutom-2022831012.github.io/Project325_Frontend",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
