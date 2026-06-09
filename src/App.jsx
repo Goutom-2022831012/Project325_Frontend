@@ -71,8 +71,8 @@ function App() {
         <header className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.3em] text-cyan-400/80">venue go</p>
-            <h1 className="mt-3 text-4xl font-semibold text-slate-100 sm:text-5xl">Venue management client</h1>
-            <p className="mt-4 max-w-2xl text-slate-400">Register or sign in to browse venues, submit booking and venue requests, or manage approvals if you are an admin.</p>
+            <h1 className="mt-3 text-4xl font-semibold text-slate-100 sm:text-5xl">Venue Management Client</h1>
+            <p className="mt-4 max-w-2xl text-slate-400">Register or sign in to browse venues, submit booking and venue requests, or manage approvals</p>
           </div>
 
           {!user && (

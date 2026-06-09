@@ -1,4 +1,5 @@
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const BASE_URL = 'https://pro325-backend.onrender.com';
+// const BASE_URL = 'http://localhost:8089';
 
 const handleResponse = async (res) => {
   const data = await res.json().catch(() => ({}));
@@ -49,6 +50,26 @@ export const submitBookingRequest = (token, payload) =>
     method: 'POST',
     body: JSON.stringify(payload),
   });
+
+// export const submitBookingRequest = async (token, data) => {
+//     const response = await fetch(
+//         `${BASE_URL}/requests/booking`,
+//         {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 Authorization: `Bearer ${token}`
+//             },
+//             body: JSON.stringify(data)
+//         }
+//     );
+//     const result = await response.json();
+//     if (!response.ok) {
+//         throw new Error(result.message);
+//     }
+//     return result;
+// };
+
 
 export const submitNewVenueRequest = (token, payload) =>
   authFetch(token, `${BASE_URL}/request/new-venue`, {

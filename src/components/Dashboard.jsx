@@ -301,7 +301,9 @@ const Dashboard = ({ user, token, onLogout, venues, onRefresh }) => {
                         <div key={request.id} className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
                           <p className="font-semibold text-slate-100">{request.event_name}</p>
                           <p className="text-sm text-slate-400">Venue: {request.venue_name || request.venue_id}</p>
+                          <p className="text-sm text-slate-400">Organization/Dept: {request.organization_name}</p>
                           <p className="text-sm text-slate-400">Date: {formatDate(request.event_date)}</p>
+                          <p className="text-sm text-slate-400"> Time: {request.start_time?.slice(0, 5)} - {request.end_time?.slice(0, 5)}</p>
                           <p className="text-sm text-slate-400">Status: {request.status}</p>
                           <div className="mt-3 flex gap-2">
                             <button
@@ -487,8 +489,9 @@ const Dashboard = ({ user, token, onLogout, venues, onRefresh }) => {
                           <div key={request.id} className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
                             <p className="font-semibold text-slate-100">{request.event_name}</p>
                             <p className="text-sm text-slate-400">Venue: {request.venue_name}</p>
-                            <p className="text-sm text-slate-400">Date: {request.event_date}</p>
-                            <p className="text-sm text-slate-400">Time: {request.start_time} - {request.end_time}</p>
+                            <p className="text-sm text-slate-400">Organization: {request.organization_name}</p>
+                            <p className="text-sm text-slate-400">Date: {formatDate(request.event_date)}</p>
+                            <p className="text-sm text-slate-400">Time: {request.start_time?.slice(0, 5)} - {request.end_time?.slice(0, 5)}</p>
                             <p className="text-sm text-slate-400">Status: {request.status}</p>
                           </div>
                         ))}
