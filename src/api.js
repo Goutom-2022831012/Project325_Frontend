@@ -1,5 +1,5 @@
-const BASE_URL = 'https://pro325-backend.onrender.com';
-// const BASE_URL = 'http://localhost:8089';
+//const BASE_URL = 'https://pro325-backend.onrender.com';
+ const BASE_URL = 'http://localhost:8089';
 
 const handleResponse = async (res) => {
   const data = await res.json().catch(() => ({}));
@@ -116,5 +116,17 @@ export const approveBookingRequest = (token, id) =>
 
 export const rejectBookingRequest = (token, id) =>
   authFetch(token, `${BASE_URL}/admin/booking-requests/${id}/reject`, {
+    method: 'PUT',
+  });
+export const fetchNotifications = (token) =>
+  authFetch(token, `${BASE_URL}/notifications`);
+
+export const markNotificationAsRead = (token, id) =>
+  authFetch(token, `${BASE_URL}/notifications/${id}/read`, {
+    method: 'PUT',
+  });
+
+export const markAllNotificationsAsRead = (token) =>
+  authFetch(token, `${BASE_URL}/notifications/read-all`, {
     method: 'PUT',
   });

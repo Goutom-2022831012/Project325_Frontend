@@ -12,6 +12,11 @@ import {
   fetchBookingRequests,
   approveBookingRequest,
   rejectBookingRequest,
+
+
+  fetchNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
 } from '../api';
 
 const Dashboard = ({ user, token, onLogout, venues, onRefresh }) => {
@@ -42,6 +47,9 @@ const Dashboard = ({ user, token, onLogout, venues, onRefresh }) => {
   const [statusError, setStatusError] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
+const [notifications, setNotifications] = useState([]);
+const [showNotifications, setShowNotifications] = useState(false);
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -61,6 +69,37 @@ const Dashboard = ({ user, token, onLogout, venues, onRefresh }) => {
     }
   }, [user.role, token]);
 
+
+  useEffect(() => {
+  if (user.role === 'representative') {
+    loadNotifications();
+  }
+}, [user.role, token]);
+
+
+const loadNotifications = async () => {
+  try {
+    const data = await fetchNotifications(token);
+    setNotifications(data);
+  } catch (err) {
+    console.log('Notification error:', err.message);
+  }
+};
+
+
+const handleNotificationClick = async (id) => {
+  try {
+    await markNotificationAsRead(token, id);
+
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === id ? { ...n, is_read: 1 } : n
+      )
+    );
+  } catch (err) {
+    console.log(err.message);
+  }
+};
   const loadUserRequests = async () => {
     setStatusError('');
     try {
@@ -169,7 +208,70 @@ const Dashboard = ({ user, token, onLogout, venues, onRefresh }) => {
             <p className="mt-2 text-sm text-slate-400">Role: {user.role || 'user'}</p>
             <p className="mt-1 text-sm text-slate-500">Status: {user.status || 'approved'}</p>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 items-center">
+
+
+
+
+            {user.role === 'representative' && (
+  <div className="relative">
+    {/* Bell Button */}
+    <button
+      onClick={() => setShowNotifications((prev) => !prev)}
+      className="relative rounded-2xl bg-slate-800 px-4 py-3 text-white"
+    >
+      🔔
+
+      {/* red dot */}
+      {notifications.some((n) => !n.is_read) && (
+        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500"></span>
+      )}
+    </button>
+
+    {/* Dropdown */}
+    {showNotifications && (
+      <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-slate-900 border border-slate-700 shadow-xl z-50">
+        <div className="p-3 border-b border-slate-700 flex justify-between">
+          <span className="text-sm text-white">Notifications</span>
+
+          <button
+            onClick={async () => {
+              await markAllNotificationsAsRead(token);
+              setNotifications((prev) =>
+                prev.map((n) => ({ ...n, is_read: 1 }))
+              );
+            }}
+            className="text-xs text-cyan-400"
+          >
+            Mark all read
+          </button>
+        </div>
+
+        <div className="max-h-80 overflow-y-auto">
+          {notifications.length === 0 ? (
+            <p className="p-3 text-slate-400 text-sm">No notifications</p>
+          ) : (
+            notifications.map((n) => (
+              <div
+                key={n.id}
+                onClick={() => handleNotificationClick(n.id)}
+                className={`p-3 border-b border-slate-800 cursor-pointer hover:bg-slate-800 ${
+                  n.is_read ? 'opacity-50' : ''
+                }`}
+              >
+                <p className="text-sm text-white">{n.title}</p>
+                <p className="text-xs text-slate-400">{n.message}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    )}
+  </div>
+)}
+
+
+            
             <button
               onClick={onRefresh}
               className="rounded-2xl bg-slate-800 px-5 py-3 text-sm text-slate-100 transition hover:bg-slate-700"
