@@ -130,3 +130,9 @@ export const markAllNotificationsAsRead = (token) =>
   authFetch(token, `${BASE_URL}/notifications/read-all`, {
     method: 'PUT',
   });
+
+  
+export const clearAllNotifications = (token) =>
+  authFetch(token, `${BASE_URL}/notifications/clear`, {
+    method: 'DELETE',
+  });

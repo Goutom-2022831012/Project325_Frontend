@@ -17,6 +17,7 @@ import {
   fetchNotifications,
   markNotificationAsRead,
   markAllNotificationsAsRead,
+   clearAllNotifications,
 } from '../api';
 
 const Dashboard = ({ user, token, onLogout, venues, onRefresh }) => {
@@ -69,12 +70,24 @@ const [showNotifications, setShowNotifications] = useState(false);
     }
   }, [user.role, token]);
 
-
-  useEffect(() => {
+useEffect(() => {
   if (user.role === 'representative') {
     loadNotifications();
+
+    const interval = setInterval(() => {
+      loadNotifications();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }
 }, [user.role, token]);
+
+
+
+const unreadCount = notifications.filter(
+  (n) => !n.is_read
+).length;
+
 
 
 const loadNotifications = async () => {
@@ -100,6 +113,17 @@ const handleNotificationClick = async (id) => {
     console.log(err.message);
   }
 };
+
+const handleClearAll = async () => {
+  try {
+    await clearAllNotifications(token);
+    setNotifications([]);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
   const loadUserRequests = async () => {
     setStatusError('');
     try {
@@ -236,29 +260,46 @@ const handleNotificationClick = async (id) => {
                   🔔
 
                   {/* red dot */}
-                  {notifications.some((n) => !n.is_read) && (
-                    <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500"></span>
+                 {unreadCount > 0 && (
+                    <span className="absolute -top-2 -right-2 min-w-[20px] h-5 px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold">
+                      {unreadCount}
+                    </span>
                   )}
                 </button>
 
                 {/* Dropdown */}
                 {showNotifications && (
                   <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-slate-900 border border-slate-700 shadow-xl z-50">
-                    <div className="p-3 border-b border-slate-700 flex justify-between">
-                      <span className="text-sm text-white">Notifications</span>
+                   <div className="p-3 border-b border-slate-700 flex justify-between items-center">
+                    <span className="text-sm text-white">
+                      Notifications ({unreadCount})
+                    </span>
 
+                    <div className="flex gap-3">
                       <button
                         onClick={async () => {
                           await markAllNotificationsAsRead(token);
+
                           setNotifications((prev) =>
-                            prev.map((n) => ({ ...n, is_read: 1 }))
+                            prev.map((n) => ({
+                              ...n,
+                              is_read: 1,
+                            }))
                           );
                         }}
                         className="text-xs text-cyan-400"
                       >
                         Mark all read
                       </button>
+
+                      <button
+                        onClick={handleClearAll}
+                        className="text-xs text-red-400"
+                      >
+                        Clear All
+                      </button>
                     </div>
+                  </div>
 
                     <div className="max-h-80 overflow-y-auto">
                       {notifications.length === 0 ? (
