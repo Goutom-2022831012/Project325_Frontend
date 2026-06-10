@@ -38,9 +38,16 @@ function App() {
       if (mode === 'login') {
         const payload = await loginUser(formData);
         setToken(payload.token);
-        setUser(payload.user);
+        // setUser(payload.user);
         localStorage.setItem('token', payload.token);
-        localStorage.setItem('user', JSON.stringify(payload.user));
+        // localStorage.setItem('user', JSON.stringify(payload.user));
+
+        const fullUser = {
+          ...payload.user
+        };
+        setUser(fullUser);
+        localStorage.setItem('user', JSON.stringify(fullUser));
+
       } else {
         await registerUser(formData);
         setMode('login');

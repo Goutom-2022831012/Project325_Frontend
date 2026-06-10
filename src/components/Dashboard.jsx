@@ -205,7 +205,20 @@ const handleNotificationClick = async (id) => {
           <div>
             <p className="text-sm text-cyan-300">Welcome back,</p>
             <h1 className="text-3xl font-semibold text-slate-100">{user.name}</h1>
-            <p className="mt-2 text-sm text-slate-400">Role: {user.role || 'user'}</p>
+            
+            <p className="mt-2 text-sm text-slate-400">
+              Role: {user.role || 'user'}
+              {user.role !== 'admin' && (
+                <>
+                  {" || "}
+                  Reg. Number: {user.registration_number || 'N/A'}
+                  {" || "}
+                  Organization: {user.organization_name || 'N/A'}
+                </>
+              )}
+            </p>
+
+
             <p className="mt-1 text-sm text-slate-500">Status: {user.status || 'approved'}</p>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
@@ -214,61 +227,61 @@ const handleNotificationClick = async (id) => {
 
 
             {user.role === 'representative' && (
-  <div className="relative">
-    {/* Bell Button */}
-    <button
-      onClick={() => setShowNotifications((prev) => !prev)}
-      className="relative rounded-2xl bg-slate-800 px-4 py-3 text-white"
-    >
-      🔔
+              <div className="relative">
+                {/* Bell Button */}
+                <button
+                  onClick={() => setShowNotifications((prev) => !prev)}
+                  className="relative rounded-2xl bg-slate-800 px-4 py-3 text-white"
+                >
+                  🔔
 
-      {/* red dot */}
-      {notifications.some((n) => !n.is_read) && (
-        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500"></span>
-      )}
-    </button>
+                  {/* red dot */}
+                  {notifications.some((n) => !n.is_read) && (
+                    <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500"></span>
+                  )}
+                </button>
 
-    {/* Dropdown */}
-    {showNotifications && (
-      <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-slate-900 border border-slate-700 shadow-xl z-50">
-        <div className="p-3 border-b border-slate-700 flex justify-between">
-          <span className="text-sm text-white">Notifications</span>
+                {/* Dropdown */}
+                {showNotifications && (
+                  <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-slate-900 border border-slate-700 shadow-xl z-50">
+                    <div className="p-3 border-b border-slate-700 flex justify-between">
+                      <span className="text-sm text-white">Notifications</span>
 
-          <button
-            onClick={async () => {
-              await markAllNotificationsAsRead(token);
-              setNotifications((prev) =>
-                prev.map((n) => ({ ...n, is_read: 1 }))
-              );
-            }}
-            className="text-xs text-cyan-400"
-          >
-            Mark all read
-          </button>
-        </div>
+                      <button
+                        onClick={async () => {
+                          await markAllNotificationsAsRead(token);
+                          setNotifications((prev) =>
+                            prev.map((n) => ({ ...n, is_read: 1 }))
+                          );
+                        }}
+                        className="text-xs text-cyan-400"
+                      >
+                        Mark all read
+                      </button>
+                    </div>
 
-        <div className="max-h-80 overflow-y-auto">
-          {notifications.length === 0 ? (
-            <p className="p-3 text-slate-400 text-sm">No notifications</p>
-          ) : (
-            notifications.map((n) => (
-              <div
-                key={n.id}
-                onClick={() => handleNotificationClick(n.id)}
-                className={`p-3 border-b border-slate-800 cursor-pointer hover:bg-slate-800 ${
-                  n.is_read ? 'opacity-50' : ''
-                }`}
-              >
-                <p className="text-sm text-white">{n.title}</p>
-                <p className="text-xs text-slate-400">{n.message}</p>
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <p className="p-3 text-slate-400 text-sm">No notifications</p>
+                      ) : (
+                        notifications.map((n) => (
+                          <div
+                            key={n.id}
+                            onClick={() => handleNotificationClick(n.id)}
+                            className={`p-3 border-b border-slate-800 cursor-pointer hover:bg-slate-800 ${
+                              n.is_read ? 'opacity-50' : ''
+                            }`}
+                          >
+                            <p className="text-sm text-white">{n.title}</p>
+                            <p className="text-xs text-slate-400">{n.message}</p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
-            ))
-          )}
-        </div>
-      </div>
-    )}
-  </div>
-)}
+            )}
 
 
             
@@ -369,7 +382,17 @@ const handleNotificationClick = async (id) => {
                       {adminData.venueRequests.map((request) => (
                         <div key={request.id} className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
                           <p className="font-semibold text-slate-100">{request.venue_name}</p>
-                          <p className="text-sm text-slate-400">Requested by ID: {request.requested_by}</p>
+                          {/* <p className="text-sm text-slate-400">Requested by ID: {request.requested_by}</p> */}
+
+                          <p className="text-sm text-slate-400">
+                            Requested by: {request.user_name}
+                          </p>
+
+                          <p className="text-sm text-slate-400">
+                            Organization: {request.organization_name}
+                          </p>
+
+
                           <p className="text-sm text-slate-400">Reason: {request.reason}</p>
                           <div className="mt-3 flex gap-2">
                             <button
